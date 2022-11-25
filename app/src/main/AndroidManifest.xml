@@ -18,14 +18,17 @@
         android:theme="@style/Theme.OpenGlProject"
         tools:targetApi="31" >
 
-        <activity android:name=".OpenGLES20Activity"
+        <activity android:name=".demo.OpenGLES20Activity"
+            android:exported="true">
+        </activity>
+
+        <activity android:name=".skybox.SkyboxActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"></action>
                 <category android:name="android.intent.category.LAUNCHER"></category>
             </intent-filter>
         </activity>
-
     </application>
 
 </manifest>

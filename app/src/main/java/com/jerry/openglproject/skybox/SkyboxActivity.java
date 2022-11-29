@@ -7,7 +7,6 @@ import android.content.pm.ConfigurationInfo;
 import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
@@ -24,7 +23,7 @@ public class SkyboxActivity extends Activity {
     private GLSurfaceView glSurfaceView;
     private boolean rendererSet = false;
     private ConfigurationInfo deviceConfigurationInfo;
-    private ParticlesRenderer airHockeyRenderer;
+    private ParticlesRenderer particlesRenderer;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -36,8 +35,8 @@ public class SkyboxActivity extends Activity {
         boolean supportEs2 = isSupportOpenGL20();
         if (supportEs2) {
              glSurfaceView.setEGLContextClientVersion(2);
-            airHockeyRenderer = new ParticlesRenderer(this);
-            glSurfaceView.setRenderer(airHockeyRenderer);
+            particlesRenderer = new ParticlesRenderer(this);
+            glSurfaceView.setRenderer(particlesRenderer);
              rendererSet = true;
         }else {
             Toast.makeText(this, "此设备不支持OpenGL ES 2.0.", Toast.LENGTH_SHORT).show();
@@ -45,21 +44,24 @@ public class SkyboxActivity extends Activity {
         setContentView(glSurfaceView);
 
         glSurfaceView.setOnTouchListener(new View.OnTouchListener() {
+            float previousX, previousY,currentX,currentY;
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event != null) {
-                    float normalizedX = (event.getX() / (float) v.getWidth()) * 2 -1;
-                    float normalizedY = -((event.getY() / (float) v.getHeight()) * 2 -1);
+                    currentX = event.getX();
+                    currentY = event.getY();
                     if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                        glSurfaceView.queueEvent(new Runnable() {
-                            @Override
-                            public void run() {
-                            }
-                        });
+                        previousX = currentX;
+                        previousY = currentY;
                     }else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+                        float deltaX = currentX - previousX;
+                        float deltaY = previousY - previousY;
+                        previousX = currentX;
+                        previousY = currentY;
                         glSurfaceView.queueEvent(new Runnable() {
                             @Override
                             public void run() {
+                                particlesRenderer.onDragEvent(deltaX,deltaY);
                             }
                         });
                     }
